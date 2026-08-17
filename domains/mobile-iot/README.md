@@ -10,7 +10,9 @@ updated: 2026-08-17
 当前从**微信小程序本地调试与鉴权模型**切入；Android/iOS 应用安全、物联网协议等尚未覆盖。
 
 - 覆盖状态真源：[`coverage.yml`](../../coverage.yml)
-- 本领域笔记：[learning/2026-08-17-wechat-miniprogram-local-debug.md](learning/2026-08-17-wechat-miniprogram-local-debug.md)
+- 本领域笔记：
+  - [learning/2026-08-17-wechat-miniprogram-local-debug.md](learning/2026-08-17-wechat-miniprogram-local-debug.md)
+  - [learning/2026-08-17-wechat-mp-tooling.md](learning/2026-08-17-wechat-mp-tooling.md)
 
 ## 子图
 
@@ -31,6 +33,7 @@ flowchart TB
     LIMIT[本地调试边界]
     CLI[开发者工具 CLI]
     TOK[业务 token 复用]
+    TOOL[分析工具栈]
   end
 
   subgraph todo [未覆盖]
@@ -45,13 +48,14 @@ flowchart TB
   MP --> LOGIN --> LIMIT
   MP --> CLI
   LOGIN --> TOK
+  MP --> TOOL
   MIOT --> AND
   MIOT --> IOS
   MIOT --> IOT
   MP --> CLOUD
 
   class LAY,CFG,CLI practiced
-  class LOGIN,LIMIT,TOK covered
+  class LOGIN,LIMIT,TOK,TOOL covered
   class AND,IOS,IOT,CLOUD uncovered
   class MP,MIOT partial
 ```
@@ -66,13 +70,14 @@ flowchart TB
 | `mp-local-debug-limits` | covered | mock 只过前端门禁 |
 | `mp-devtools-cli` | practiced | wechatide 授权调试用途 |
 | `mp-auth-token-reuse` | covered | 合法长效 token 可减少反复 wx.login |
+| `mp-tooling` 及 unveilr / EasyTools / OpenDevTools / First / wechatide-skill | covered | 产物还原、官方调试、新旧运行时、工作台分层；新版微信 OpenDevTools 不可用 |
 
 ## 未覆盖（建议顺序）
 
 1. 自有小程序上的 automator + 测试号实践
-2. 小程序云开发鉴权概念
-3. Android 应用基础（APK 结构、权限）
-4. iOS / 物联网另开专题
+2. First 在授权实验室的实践记录（工具已入图谱）
+3. 小程序云开发鉴权概念
+4. Android 应用基础（APK 结构、权限）
 
 ## 与其他领域的边
 

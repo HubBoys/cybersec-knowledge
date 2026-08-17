@@ -57,9 +57,10 @@ flowchart TB
   RE -.过程框架交叉.-> DFIR
   RE -.IOC 交叉.-> TI
   IOT -.鉴权交叉.-> ID
+  NET -.弱口令交叉.-> ID
 
-  class N,OS,CR,MA,WEB,NET,CL,DFIR,DET,SOC,SDLC,GRC,ARCH uncovered
-  class F,SP,RE,TI,IOT,ID partial
+  class N,OS,CR,MA,CL,DFIR,DET,SOC,SDLC,GRC,ARCH uncovered
+  class F,SP,RE,TI,IOT,ID,WEB,NET partial
   class ABI covered
 ```
 
@@ -148,6 +149,7 @@ flowchart TB
     LIMIT[本地调试边界 · 已覆盖]
     CLI[开发者工具 CLI · 已实践]
     TOK[业务 token 复用 · 已覆盖]
+    TOOL[分析工具栈 · 已覆盖]
   end
 
   subgraph todo [未覆盖]
@@ -162,15 +164,45 @@ flowchart TB
   MP --> LOGIN --> LIMIT
   LOGIN --> TOK
   MP --> CLI
+  MP --> TOOL
   MP --> CLOUD
   MIOT --> AND
   MIOT --> IOS
   MIOT --> IOTDEV
 
   class LAY,CFG,CLI practiced
-  class LOGIN,LIMIT,TOK covered
+  class LOGIN,LIMIT,TOK,TOOL covered
   class CLOUD,AND,IOS,IOTDEV uncovered
   class MIOT,MP partial
+```
+
+## 网络安全与流量分析（在线登录探测）
+
+```mermaid
+flowchart TB
+  classDef uncovered fill:#e5e7eb,stroke:#6b7280,color:#111
+  classDef covered fill:#dcfce7,stroke:#15803d,color:#111
+  classDef partial fill:#ffedd5,stroke:#c2410c,color:#111
+
+  NET[网络安全与流量分析 · 部分覆盖]
+  DIFF[在线探测 vs 离线恢复 · 已覆盖]
+  PROBE[在线登录探测工具 · 部分覆盖]
+  H[THC-Hydra · 已覆盖]
+  M[Medusa · 已覆盖]
+  NC[Ncrack · 未覆盖]
+  PKT[抓包与流量分析 · 未覆盖]
+  IDS[IDS/IPS · 未覆盖]
+
+  NET --> DIFF --> PROBE
+  PROBE --> H
+  PROBE --> M
+  PROBE --> NC
+  NET --> PKT
+  NET --> IDS
+
+  class DIFF,H,M covered
+  class NC,PKT,IDS uncovered
+  class NET,PROBE partial
 ```
 
 ## 覆盖一览
@@ -180,11 +212,11 @@ flowchart TB
 | 基础底座 / 网络、OS、密码学 | 部分覆盖（仅 ABI 已覆盖） | [2026-08-17 逆向](domains/reverse-engineering/learning/2026-08-17-binary-reverse-engineering.md) |
 | 系统编程 / ABI 与调用约定 | 部分 / ABI 已覆盖 | 同上 |
 | **二进制逆向分析** | **部分覆盖** | 同上 |
-| **移动与物联网安全** | **部分覆盖** | [2026-08-17 小程序](domains/mobile-iot/learning/2026-08-17-wechat-miniprogram-local-debug.md) |
-| **身份认证与访问控制** | **部分覆盖**（小程序登录交叉） | 同上 |
+| **移动与物联网安全** | **部分覆盖** | [2026-08-17 小程序](domains/mobile-iot/learning/2026-08-17-wechat-miniprogram-local-debug.md) · [工具栈](domains/mobile-iot/learning/2026-08-17-wechat-mp-tooling.md) |
+| **身份认证与访问控制** | **部分覆盖**（小程序登录 + 弱口令在线探测交叉） | [小程序本地调试](domains/mobile-iot/learning/2026-08-17-wechat-miniprogram-local-debug.md) · [Hydra/Medusa](domains/network-security/learning/2026-08-17-hydra-medusa.md) |
 | 恶意软件分析 | 未覆盖 | — |
-| Web 安全 | 未覆盖 | — |
-| 网络安全与流量分析 | 未覆盖 | — |
+| Web 安全 | 部分覆盖（仅 EasyTools 定位） | [工具栈](domains/mobile-iot/learning/2026-08-17-wechat-mp-tooling.md) |
+| **网络安全与流量分析** | **部分覆盖**（Hydra/Medusa 概念） | [2026-08-17 Hydra/Medusa](domains/network-security/learning/2026-08-17-hydra-medusa.md) |
 | 云与容器安全 | 未覆盖 | — |
 | 应急响应与取证 | 未覆盖 | 过程框架仅在逆向中提及 |
 | 威胁情报 | 部分覆盖（IOC/IOA） | 逆向笔记 |

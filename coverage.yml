@@ -42,7 +42,7 @@ domains:
       - id: crypto-basics
         name: 密码学基础
         status: uncovered
-        notes: 哈希、对称/非对称、证书、常见误用
+        notes: 哈希、对称/非对称、证书、常见误用。Hydra/Medusa 学习中仅对照到「离线哈希恢复 ≠ 在线登录探测」，Hashcat/John 本身未覆盖
 
   - id: reverse-engineering
     name: 二进制逆向分析
@@ -134,16 +134,65 @@ domains:
 
   - id: web-security
     name: Web 安全
-    status: uncovered
+    status: partial
+    notes: 目前仅覆盖个人工作台 EasyTools 的定位；OWASP 与常见漏洞模型未覆盖
+    children:
+      - id: web-toolkit-easytools
+        name: EasyTools 工作台（交叉）
+        status: covered
+        notes: 详见 mobile-iot 的 mp-tool-easytools
+        learning_notes:
+          - domains/mobile-iot/learning/2026-08-17-wechat-mp-tooling.md
+      - id: web-owasp-basics
+        name: OWASP 与常见 Web 风险模型
+        status: uncovered
 
   - id: network-security
     name: 网络安全与流量分析
-    status: uncovered
+    status: partial
+    notes: 目前仅覆盖在线登录探测工具 Hydra/Medusa 的概念对照；抓包、流量分析、IDS/IPS 未覆盖
+    first_studied: 2026-08-17
+    learning_notes:
+      - domains/network-security/learning/2026-08-17-hydra-medusa.md
+    children:
+      - id: net-online-vs-offline-auth
+        name: 在线登录探测 vs 离线哈希恢复
+        status: covered
+        notes: 只记分工与风险差异；Hashcat/John 本身未学
+        learning_notes:
+          - domains/network-security/learning/2026-08-17-hydra-medusa.md
+      - id: net-login-probers
+        name: 在线登录探测工具
+        status: partial
+        notes: Hydra/Medusa 已覆盖概念；Ncrack 未学。只记名称、架构与选用边界；不含探测操作手册
+        learning_notes:
+          - domains/network-security/learning/2026-08-17-hydra-medusa.md
+        children:
+          - id: net-thc-hydra
+            name: THC-Hydra
+            status: covered
+            learning_notes:
+              - domains/network-security/learning/2026-08-17-hydra-medusa.md
+          - id: net-medusa
+            name: Medusa
+            status: covered
+            learning_notes:
+              - domains/network-security/learning/2026-08-17-hydra-medusa.md
+          - id: net-ncrack
+            name: Ncrack
+            status: uncovered
+            notes: 对照中提及，未单独学习
+      - id: net-packet-analysis
+        name: 抓包与流量分析
+        status: uncovered
+      - id: net-ids-ips
+        name: IDS/IPS 概念
+        status: uncovered
 
   - id: identity
     name: 身份认证与访问控制
     status: partial
-    notes: 微信小程序 wx.login / 业务 token 概念已覆盖；OAuth、会话管理、MFA 等未覆盖
+    notes: 微信小程序 wx.login / 业务 token 概念已覆盖；弱口令在线探测与 Hydra/Medusa 交叉已覆盖；OAuth、会话管理、MFA 等未覆盖
     children:
       - id: id-wx-login-crossref
         name: 小程序登录与业务 token（交叉）
@@ -160,6 +209,12 @@ domains:
       - id: id-mfa
         name: 多因素认证
         status: uncovered
+      - id: id-weak-password-online
+        name: 弱口令在线探测（交叉）
+        status: covered
+        notes: 详见 network-security 的 Hydra/Medusa；只记分工与选用，不含探测步骤
+        learning_notes:
+          - domains/network-security/learning/2026-08-17-hydra-medusa.md
 
   - id: cloud-security
     name: 云与容器安全
@@ -171,12 +226,14 @@ domains:
     first_studied: 2026-08-17
     learning_notes:
       - domains/mobile-iot/learning/2026-08-17-wechat-miniprogram-local-debug.md
+      - domains/mobile-iot/learning/2026-08-17-wechat-mp-tooling.md
     children:
       - id: wechat-miniprogram
         name: 微信小程序
         status: partial
         learning_notes:
           - domains/mobile-iot/learning/2026-08-17-wechat-miniprogram-local-debug.md
+          - domains/mobile-iot/learning/2026-08-17-wechat-mp-tooling.md
         children:
           - id: mp-wxapkg-layout
             name: 客户端缓存包与导入布局
@@ -208,6 +265,40 @@ domains:
             status: covered
             learning_notes:
               - domains/mobile-iot/learning/2026-08-17-wechat-miniprogram-local-debug.md
+          - id: mp-tooling
+            name: 小程序分析工具栈
+            status: covered
+            notes: 只记名称、分层与版本边界；不含未授权操作步骤
+            learning_notes:
+              - domains/mobile-iot/learning/2026-08-17-wechat-mp-tooling.md
+            children:
+              - id: mp-tool-unveilr
+                name: unveilr（wxapkg 还原）
+                status: covered
+                learning_notes:
+                  - domains/mobile-iot/learning/2026-08-17-wechat-mp-tooling.md
+              - id: mp-tool-easytools
+                name: EasyTools（工作台）
+                status: covered
+                learning_notes:
+                  - domains/mobile-iot/learning/2026-08-17-wechat-mp-tooling.md
+              - id: mp-tool-wxopendevtools
+                name: WeChatOpenDevTools-Python（旧版运行时）
+                status: covered
+                notes: 新版微信不可用
+                learning_notes:
+                  - domains/mobile-iot/learning/2026-08-17-wechat-mp-tooling.md
+              - id: mp-tool-first
+                name: First / WMPFDebugger（新版运行时）
+                status: covered
+                learning_notes:
+                  - domains/mobile-iot/learning/2026-08-17-wechat-mp-tooling.md
+              - id: mp-tool-wechatide-skill
+                name: 官方 wechatide-skill 用法
+                status: covered
+                notes: 只了解用法，未在本仓库安装该 skill
+                learning_notes:
+                  - domains/mobile-iot/learning/2026-08-17-wechat-mp-tooling.md
           - id: mp-cloud-dev
             name: 小程序云开发安全
             status: uncovered
