@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>知识覆盖图 · 网络安全</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@600;700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --night: #10140e;
+      --panel: #1a2018;
+      --line: #2c3528;
+      --ink: #e6e2d4;
+      --muted: #9aa392;
+      --ash: #6a7064;
+      --brass: #c4a35a;
+      --sage: #8fbc8f;
+      --steel: #7a9bb8;
+      --focus: #e6e2d4;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--night); color: var(--ink); }
+    body {
+      font-family: Figtree, "Segoe UI", sans-serif;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      min-height: 100vh;
+    }
+    button, input { font: inherit; color: inherit; }
+    a { color: var(--steel); }
+    .wrap { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+
+    header {
+      border-bottom: 1px solid var(--line);
+      padding: 28px 0 18px;
+    }
+    .mast {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: end;
+    }
+    .wordmark {
+      font-family: Syne, sans-serif;
+      font-size: 28px;
+      letter-spacing: -0.03em;
+      margin: 0;
+    }
+    .meta {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 12px;
+      color: var(--muted);
+      text-align: right;
+      line-height: 1.6;
+    }
+    .lede {
+      margin: 8px 0 0;
+      color: var(--muted);
+      max-width: 42em;
+    }
+
+    .barcode {
+      display: flex;
+      height: 28px;
+      margin-top: 18px;
+      border: 1px solid var(--line);
+      background: #141910;
+    }
+    .barcode span {
+      flex: 1 1 0;
+      min-width: 3px;
+      cursor: pointer;
+    }
+    .barcode span:hover { outline: 1px solid var(--ink); outline-offset: -1px; }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .stat {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      padding-right: 16px;
+      border-right: 1px solid var(--line);
+    }
+    .stat b {
+      font-family: Syne, sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .stat span { color: var(--muted); font-size: 12px; }
+    .filters { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; }
+    .chip, .search {
+      border: 1px solid var(--line);
+      background: transparent;
+      padding: 6px 10px;
+      border-radius: 2px;
+    }
+    .chip[aria-pressed="true"] { background: var(--ink); color: var(--night); }
+    .search { min-width: 180px; outline: none; }
+    .search:focus { border-color: var(--ink); }
+
+    main {
+      display: grid;
+      grid-template-columns: 1fr minmax(280px, 340px);
+      min-height: 0;
+    }
+    .map { padding: 22px 0 48px; overflow: auto; }
+    .group + .group { margin-top: 28px; }
+    .group h2 {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0 0 12px;
+    }
+    .plots {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 10px;
+    }
+    .plot {
+      text-align: left;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 14px 14px 12px;
+      cursor: pointer;
+      min-height: 108px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .plot:hover, .plot[aria-current="true"] { border-color: var(--ink); }
+    .plot-top { display: flex; justify-content: space-between; gap: 8px; align-items: start; }
+    .plot h3 { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.25; }
+    .tag {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+    .track { height: 7px; background: #10140e; display: flex; overflow: hidden; }
+    .track i { display: block; height: 100%; }
+    .plot p { margin: 0; color: var(--muted); font-size: 12px; }
+
+    aside {
+      border-left: 1px solid var(--line);
+      padding: 22px 0 22px 22px;
+      overflow: auto;
+    }
+    aside h2 { font-family: Syne, sans-serif; font-size: 20px; margin: 0 0 8px; }
+    aside .empty { color: var(--muted); }
+    .kv { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+    .notes { font-size: 14px; line-height: 1.55; margin: 0 0 16px; }
+    .kids { list-style: none; margin: 0; padding: 0; }
+    .kids li {
+      display: grid;
+      grid-template-columns: 10px 1fr auto;
+      gap: 8px;
+      align-items: center;
+      padding: 7px 0;
+      border-top: 1px solid var(--line);
+      font-size: 13px;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 1px; }
+    .links { margin-top: 16px; font-size: 13px; }
+    .links a { display: block; margin: 6px 0; word-break: break-all; }
+
+    .s-uncovered { color: var(--ash); background: var(--ash); }
+    .s-partial { color: var(--brass); background: var(--brass); }
+    .s-covered { color: var(--sage); background: var(--sage); }
+    .s-practiced { color: var(--steel); background: var(--steel); }
+    .tag.s-uncovered, .tag.s-partial, .tag.s-covered, .tag.s-practiced { background: transparent; }
+
+    @media (max-width: 860px) {
+      main { grid-template-columns: 1fr; }
+      aside { border-left: 0; border-top: 1px solid var(--line); padding: 18px 0 40px; }
+      .mast { flex-direction: column; align-items: start; }
+      .meta { text-align: left; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="mast">
+        <div>
+          <p class="wordmark">知识覆盖图</p>
+          <p class="lede">一张图看清网络安全各领域学到哪了。色条是每个知识点的状态；点领域看明细。</p>
+        </div>
+        <div class="meta" id="meta"></div>
+      </div>
+      <div class="barcode" id="barcode" title="每个竖条是一个知识点"></div>
+    </div>
+  </header>
+
+  <div class="wrap toolbar" id="toolbar"></div>
+
+  <main class="wrap">
+    <section class="map" id="map"></section>
+    <aside id="detail">
+      <p class="empty">点左侧一个领域，查看子节点和学习记录。</p>
+    </aside>
+  </main>
+
+  <script src="dashboard/coverage.js"></script>
+  <script>
+    const LABELS = { uncovered: "未覆盖", partial: "部分覆盖", covered: "已覆盖", practiced: "已实践" };
+    const GROUPS = [
+      { name: "基础", ids: ["foundations"] },
+      { name: "技术方向", ids: ["reverse-engineering", "malware-analysis", "web-security", "network-security", "identity", "cloud-security", "mobile-iot"] },
+      { name: "防御运营", ids: ["dfir", "threat-intel", "detection-eng", "soc"] },
+      { name: "工程与治理", ids: ["secure-sdlc", "grc", "security-architecture"] },
+    ];
+
+    const data = window.COVERAGE;
+    if (!data) {
+      document.body.innerHTML = "<p style='padding:24px'>缺少 dashboard/coverage.js。请运行 python scripts/sync_dashboard.py</p>";
+      throw new Error("no coverage");
+    }
+
+    const state = { filter: "all", q: "", selected: "reverse-engineering" };
+
+    function leaves(node, acc = []) {
+      if (!node.children || !node.children.length) acc.push(node);
+      else node.children.forEach((c) => leaves(c, acc));
+      return acc;
+    }
+    function walk(node, acc = []) {
+      acc.push(node);
+      (node.children || []).forEach((c) => walk(c, acc));
+      return acc;
+    }
+    function counts(node) {
+      const ls = leaves(node);
+      const tally = { uncovered: 0, partial: 0, covered: 0, practiced: 0 };
+      ls.forEach((n) => { tally[n.status] += 1; });
+      const done = tally.covered + tally.practiced;
+      return { ...tally, total: ls.length, done, ratio: ls.length ? done / ls.length : 0 };
+    }
+    function find(id, nodes = data.domains) {
+      for (const n of nodes) {
+        if (n.id === id) return n;
+        const hit = find(id, n.children || []);
+        if (hit) return hit;
+      }
+      return null;
+    }
+    function matchFilter(node) {
+      if (state.filter !== "all" && node.status !== state.filter) return false;
+      if (!state.q) return true;
+      const blob = (node.name + node.id + (node.notes || "")).toLowerCase();
+      return blob.includes(state.q);
+    }
+
+    const allLeaves = data.domains.flatMap((d) => leaves(d));
+    const global = allLeaves.reduce((a, n) => { a[n.status] += 1; return a; }, { uncovered: 0, partial: 0, covered: 0, practiced: 0 });
+
+    document.getElementById("meta").innerHTML =
+      `学习者 ${data.learner}<br>状态真源 coverage.yml<br>同步 ${data.updated}`;
+
+    const barcode = document.getElementById("barcode");
+    allLeaves.forEach((n) => {
+      const el = document.createElement("span");
+      el.className = "s-" + n.status;
+      el.title = `${n.name} · ${LABELS[n.status]}`;
+      el.onclick = () => {
+        const parent = data.domains.find((d) => walk(d).some((x) => x.id === n.id));
+        state.selected = parent ? parent.id : n.id;
+        render();
+      };
+      barcode.appendChild(el);
+    });
+
+    function renderToolbar() {
+      const tb = document.getElementById("toolbar");
+      const chips = ["all", "uncovered", "partial", "covered", "practiced"]
+        .map((k) => {
+          const label = k === "all" ? "全部" : LABELS[k];
+          return `<button class="chip" data-f="${k}" aria-pressed="${state.filter === k}">${label}</button>`;
+        }).join("");
+      tb.innerHTML = `
+        <div class="stat"><b>${allLeaves.length}</b><span>知识点</span></div>
+        <div class="stat"><b>${global.covered + global.practiced}</b><span>已覆盖</span></div>
+        <div class="stat"><b>${global.uncovered}</b><span>未覆盖</span></div>
+        <div class="stat"><b>${Math.round((global.covered + global.practiced) / allLeaves.length * 100)}%</b><span>概念完成率</span></div>
+        <div class="filters">${chips}<input class="search" placeholder="搜索领域 / 节点" value="${state.q.replaceAll('"', "&quot;")}" /></div>
+      `;
+      tb.querySelectorAll("[data-f]").forEach((b) => b.onclick = () => { state.filter = b.dataset.f; render(); });
+      tb.querySelector(".search").oninput = (e) => { state.q = e.target.value.trim().toLowerCase(); render(); };
+    }
+
+    function renderMap() {
+      const byId = Object.fromEntries(data.domains.map((d) => [d.id, d]));
+      const map = document.getElementById("map");
+      map.innerHTML = GROUPS.map((g) => {
+        const plots = g.ids.map((id) => byId[id]).filter(Boolean).filter(matchFilter);
+        if (!plots.length) return "";
+        return `<section class="group"><h2>${g.name}</h2><div class="plots">${plots.map(plotHtml).join("")}</div></section>`;
+      }).join("") || `<p class="empty">没有匹配的领域。</p>`;
+      map.querySelectorAll(".plot").forEach((el) => {
+        el.onclick = () => { state.selected = el.dataset.id; render(); };
+      });
+    }
+
+    function plotHtml(node) {
+      const c = counts(node);
+      const doneW = (c.ratio * 100).toFixed(1);
+      const rest = (100 - c.ratio * 100).toFixed(1);
+      return `<button class="plot" data-id="${node.id}" aria-current="${state.selected === node.id}">
+        <div class="plot-top">
+          <h3>${node.name}</h3>
+          <span class="tag s-${node.status}">${LABELS[node.status]}</span>
+        </div>
+        <div class="track" title="${c.done}/${c.total} 个知识点已覆盖">
+          <i class="s-covered" style="width:${doneW}%;background:var(--sage)"></i>
+          <i class="s-uncovered" style="width:${rest}%;background:#2a3226"></i>
+        </div>
+        <p>${c.done}/${c.total} 知识点 · ${c.uncovered} 个缺口</p>
+      </button>`;
+    }
+
+    function renderDetail() {
+      const node = find(state.selected);
+      const box = document.getElementById("detail");
+      if (!node) { box.innerHTML = `<p class="empty">未选中领域。</p>`; return; }
+      const kids = [];
+      (function collect(n, depth) {
+        (n.children || []).forEach((c) => {
+          kids.push({ ...c, depth });
+          collect(c, depth + 1);
+        });
+      })(node, 0);
+      const notes = (node.learning_notes || []).map((p) => `<a href="${p}">${p}</a>`).join("");
+      const list = kids.length
+        ? `<ul class="kids">${kids.map((k) => `<li>
+            <span class="dot s-${k.status}"></span>
+            <span style="padding-left:${k.depth * 12}px">${k.name}</span>
+            <span class="tag s-${k.status}">${LABELS[k.status]}</span>
+          </li>`).join("")}</ul>`
+        : `<p class="empty">该领域还没有拆子节点。</p>`;
+      box.innerHTML = `
+        <h2>${node.name}</h2>
+        <div class="kv">${node.id} · ${LABELS[node.status]}${node.first_studied ? " · 始学 " + node.first_studied : ""}</div>
+        ${node.notes ? `<p class="notes">${node.notes}</p>` : ""}
+        ${list}
+        ${notes ? `<div class="links"><strong>学习记录</strong>${notes}</div>` : ""}
+      `;
+    }
+
+    function render() {
+      renderToolbar();
+      renderMap();
+      renderDetail();
+    }
+    render();
+  </script>
+</body>
+</html>

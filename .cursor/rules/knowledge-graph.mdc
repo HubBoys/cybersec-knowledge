@@ -1,0 +1,13 @@
+---
+description: 更新网络安全知识图谱的覆盖状态与学习记录时必须遵循 AGENTS.md
+globs:
+alwaysApply: true
+---
+
+# 知识图谱维护
+
+本仓库是网络安全知识图谱。修改覆盖状态、新增领域或写学习记录前，先读并遵循仓库根目录的 `AGENTS.md`。
+
+- 真源是 `coverage.yml`，再同步 `index.html`（运行 `python scripts/sync_dashboard.py`）、`graph.md` 与 `progress/LEARNING_LOG.md`
+- 没有学习记录不得标记 `covered` 或 `practiced`
+- 不写入 exploit、破解或未授权访问步骤

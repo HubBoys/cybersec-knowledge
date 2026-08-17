@@ -1,0 +1,289 @@
+/* 由 scripts/sync_dashboard.py 从 coverage.yml 生成，不要手改。 */
+window.COVERAGE = {
+  "version": 1,
+  "updated": "2026-08-17",
+  "learner": "summyer",
+  "legend": {
+    "uncovered": "未覆盖——图谱中有节点，尚无学习记录",
+    "partial": "部分覆盖——子节点有已学内容，领域整体未闭环",
+    "covered": "已覆盖——能复述要点，且有对应学习记录；默认仍属概念层",
+    "practiced": "已实践——在隔离环境动手验证过，学习记录中写明实践证据"
+  },
+  "domains": [
+    {
+      "id": "foundations",
+      "name": "基础底座",
+      "status": "partial",
+      "children": [
+        {
+          "id": "network",
+          "name": "计算机网络",
+          "status": "uncovered",
+          "notes": "TCP/IP、以太网、DNS、HTTP、TLS、抓包阅读"
+        },
+        {
+          "id": "operating-systems",
+          "name": "操作系统",
+          "status": "uncovered",
+          "notes": "进程/线程、内存、权限模型、Windows 与 Linux 差异"
+        },
+        {
+          "id": "systems-programming",
+          "name": "系统编程",
+          "status": "partial",
+          "notes": "C/Python；C 与 ABI 仅在逆向领域概念覆盖",
+          "children": [
+            {
+              "id": "c-language",
+              "name": "C 语言",
+              "status": "uncovered"
+            },
+            {
+              "id": "python",
+              "name": "Python",
+              "status": "uncovered"
+            },
+            {
+              "id": "abi-calling-convention",
+              "name": "ABI 与调用约定",
+              "status": "covered",
+              "learning_notes": [
+                "domains/reverse-engineering/learning/2026-08-17-binary-reverse-engineering.md"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "crypto-basics",
+          "name": "密码学基础",
+          "status": "uncovered",
+          "notes": "哈希、对称/非对称、证书、常见误用"
+        }
+      ]
+    },
+    {
+      "id": "reverse-engineering",
+      "name": "二进制逆向分析",
+      "status": "partial",
+      "first_studied": "2026-08-17",
+      "learning_notes": [
+        "domains/reverse-engineering/learning/2026-08-17-binary-reverse-engineering.md"
+      ],
+      "children": [
+        {
+          "id": "re-process",
+          "name": "逆向完整过程",
+          "status": "covered"
+        },
+        {
+          "id": "re-lab",
+          "name": "隔离实验室",
+          "status": "covered"
+        },
+        {
+          "id": "re-file-id",
+          "name": "文件鉴定与分类",
+          "status": "covered"
+        },
+        {
+          "id": "re-static-props",
+          "name": "静态属性分析",
+          "status": "covered"
+        },
+        {
+          "id": "re-sandbox",
+          "name": "自动化沙箱初判",
+          "status": "covered"
+        },
+        {
+          "id": "re-behavior",
+          "name": "行为分析",
+          "status": "covered"
+        },
+        {
+          "id": "re-sandbox-vs-behavior",
+          "name": "沙箱与行为分析的差异",
+          "status": "covered"
+        },
+        {
+          "id": "re-static-code",
+          "name": "静态代码分析",
+          "status": "covered"
+        },
+        {
+          "id": "re-dynamic-code",
+          "name": "动态代码分析",
+          "status": "covered"
+        },
+        {
+          "id": "re-report",
+          "name": "重建、验证与报告",
+          "status": "covered"
+        },
+        {
+          "id": "re-ioc",
+          "name": "IOC 概念",
+          "status": "covered"
+        },
+        {
+          "id": "re-tools",
+          "name": "各阶段推荐工具",
+          "status": "covered"
+        },
+        {
+          "id": "re-assembly-strategy",
+          "name": "汇编阅读策略",
+          "status": "covered"
+        },
+        {
+          "id": "re-c-abi-why",
+          "name": "为何需要 C 与 ABI",
+          "status": "covered"
+        },
+        {
+          "id": "re-ai-barrier",
+          "name": "AI 时代的逆向门槛",
+          "status": "covered"
+        },
+        {
+          "id": "re-x86-asm",
+          "name": "x86-64 汇编实践",
+          "status": "uncovered"
+        },
+        {
+          "id": "re-pe-elf",
+          "name": "PE / ELF 格式深入",
+          "status": "uncovered"
+        },
+        {
+          "id": "re-ghidra",
+          "name": "Ghidra 实操",
+          "status": "uncovered"
+        },
+        {
+          "id": "re-debugger",
+          "name": "调试器实操",
+          "status": "uncovered"
+        },
+        {
+          "id": "re-unpacking",
+          "name": "加壳识别与授权实验室内还原",
+          "status": "uncovered"
+        },
+        {
+          "id": "re-obfuscation",
+          "name": "混淆与对抗分析",
+          "status": "uncovered"
+        },
+        {
+          "id": "re-yara",
+          "name": "YARA 检测规则",
+          "status": "uncovered"
+        },
+        {
+          "id": "re-cpp",
+          "name": "C++ 逆向",
+          "status": "uncovered"
+        },
+        {
+          "id": "re-managed",
+          "name": ".NET / Java 托管代码逆向",
+          "status": "uncovered"
+        },
+        {
+          "id": "re-firmware",
+          "name": "固件逆向",
+          "status": "uncovered"
+        }
+      ]
+    },
+    {
+      "id": "malware-analysis",
+      "name": "恶意软件分析",
+      "status": "uncovered",
+      "notes": "与逆向相邻；行为/沙箱概念已在逆向中接触，本领域未单列学习"
+    },
+    {
+      "id": "web-security",
+      "name": "Web 安全",
+      "status": "uncovered"
+    },
+    {
+      "id": "network-security",
+      "name": "网络安全与流量分析",
+      "status": "uncovered"
+    },
+    {
+      "id": "identity",
+      "name": "身份认证与访问控制",
+      "status": "uncovered"
+    },
+    {
+      "id": "cloud-security",
+      "name": "云与容器安全",
+      "status": "uncovered"
+    },
+    {
+      "id": "mobile-iot",
+      "name": "移动与物联网安全",
+      "status": "uncovered"
+    },
+    {
+      "id": "dfir",
+      "name": "应急响应与取证",
+      "status": "uncovered",
+      "notes": "NIST 采集-检验-分析-报告框架已在逆向过程中提及，本领域未单列学习"
+    },
+    {
+      "id": "threat-intel",
+      "name": "威胁情报",
+      "status": "partial",
+      "notes": "IOC / IOA 概念已覆盖；情报生命周期、STIX/TAXII 等未覆盖",
+      "children": [
+        {
+          "id": "ioc-ioa",
+          "name": "IOC 与 IOA",
+          "status": "covered",
+          "learning_notes": [
+            "domains/reverse-engineering/learning/2026-08-17-binary-reverse-engineering.md"
+          ]
+        },
+        {
+          "id": "intel-lifecycle",
+          "name": "情报生命周期",
+          "status": "uncovered"
+        },
+        {
+          "id": "intel-sharing",
+          "name": "情报共享格式",
+          "status": "uncovered"
+        }
+      ]
+    },
+    {
+      "id": "detection-eng",
+      "name": "检测工程",
+      "status": "uncovered"
+    },
+    {
+      "id": "soc",
+      "name": "SOC 运营",
+      "status": "uncovered"
+    },
+    {
+      "id": "secure-sdlc",
+      "name": "安全开发生命周期",
+      "status": "uncovered"
+    },
+    {
+      "id": "grc",
+      "name": "风险管理与合规",
+      "status": "uncovered"
+    },
+    {
+      "id": "security-architecture",
+      "name": "安全架构",
+      "status": "uncovered"
+    }
+  ]
+};
