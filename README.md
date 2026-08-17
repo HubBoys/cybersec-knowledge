@@ -2,7 +2,7 @@
 
 个人系统学习网络安全用的知识仓库：一张图看清**学过什么、还没学什么**；学过的内容另有学习记录可复习。
 
-**可视化入口：** 用浏览器打开 [`index.html`](index.html)（双击即可，不需要启动服务器）。
+**可视化入口：** 用浏览器打开 [`index.html`](index.html)（双击即可，不需要启动服务器）。右侧点学习记录会进入 Markdown 预览，支持 Mermaid 图。
 
 - 覆盖状态真源：[`coverage.yml`](coverage.yml)
 - 图谱视图：[`graph.md`](graph.md)

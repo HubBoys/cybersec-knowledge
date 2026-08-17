@@ -10,6 +10,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 YML = ROOT / "coverage.yml"
 OUT = ROOT / "dashboard" / "coverage.js"
+NOTE_GLOBS = (
+    "domains/**/*.md",
+    "progress/*.md",
+    "graph.md",
+)
 
 
 def parse_scalar(raw: str):
@@ -99,16 +104,33 @@ def parse_yaml(text: str):
     return data
 
 
+def collect_notes() -> dict[str, str]:
+    """把学习记录等 Markdown 打进 coverage.js，file:// 下也能预览。"""
+    paths: set[Path] = set()
+    for pattern in NOTE_GLOBS:
+        paths.update(ROOT.glob(pattern))
+    notes: dict[str, str] = {}
+    for path in sorted(paths):
+        if not path.is_file():
+            continue
+        rel = path.relative_to(ROOT).as_posix()
+        notes[rel] = path.read_text(encoding="utf-8")
+    return notes
+
+
 def main() -> int:
     data = parse_yaml(YML.read_text(encoding="utf-8"))
+    notes = collect_notes()
     OUT.parent.mkdir(parents=True, exist_ok=True)
     payload = json.dumps(data, ensure_ascii=False, indent=2)
+    notes_payload = json.dumps(notes, ensure_ascii=False, indent=2)
     OUT.write_text(
-        "/* 由 scripts/sync_dashboard.py 从 coverage.yml 生成，不要手改。 */\n"
-        f"window.COVERAGE = {payload};\n",
+        "/* 由 scripts/sync_dashboard.py 从 coverage.yml 与 Markdown 生成，不要手改。 */\n"
+        f"window.COVERAGE = {payload};\n"
+        f"window.NOTES = {notes_payload};\n",
         encoding="utf-8",
     )
-    print(f"wrote {OUT.relative_to(ROOT)}")
+    print(f"wrote {OUT.relative_to(ROOT)} ({len(notes)} notes)")
     return 0
 
 

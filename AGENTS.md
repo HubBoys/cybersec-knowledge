@@ -75,7 +75,7 @@ Agent 的职责是：把新学到的知识挂到图谱上、更新覆盖状态�
 ### 4. 同步给人看的图谱和可视化入口
 
 1. 在仓库根目录运行：`python scripts/sync_dashboard.py`  
-   这会从 `coverage.yml` 生成 `dashboard/coverage.js`。`index.html` 打开后应能看到新状态。
+   这会从 `coverage.yml` 生成 `dashboard/coverage.js`，并把 `domains/**/*.md`、`progress/*.md`、`graph.md` 打进 `window.NOTES`，供 `index.html` 做 Markdown / Mermaid 预览。
 2. 改 `graph.md`：
    - 顶层总图的节点颜色 / 标记与 `coverage.yml` 一致
    - 若改了某个领域，同步该领域的子图（`graph.md` 后半，或 `domains/<id>/README.md` 里的图）
@@ -114,6 +114,7 @@ Agent 的职责是：把新学到的知识挂到图谱上、更新覆盖状态�
 
 - 领域目录、节点 `id`：英文短横线，如 `reverse-engineering`
 - 学习记录：`YYYY-MM-DD-英文或拼音短标题.md`
+- 正文用 Markdown；流程图用 ` ```mermaid ` 代码块。同步后在 `index.html` 预览，不要用浏览器直接打开 `.md`
 - 不要用「最终版」「新新新」当文件名
 
 ## 与学习者沟通

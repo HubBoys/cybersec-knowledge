@@ -173,7 +173,110 @@
     }
     .dot { width: 8px; height: 8px; border-radius: 1px; }
     .links { margin-top: 16px; font-size: 13px; }
-    .links a { display: block; margin: 6px 0; word-break: break-all; }
+    .links a, .links button.linkish { display: block; margin: 6px 0; word-break: break-all; }
+    button.linkish {
+      background: none;
+      border: 0;
+      padding: 0;
+      color: var(--steel);
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .reader {
+      position: fixed;
+      inset: 0;
+      background: var(--night);
+      z-index: 20;
+      display: none;
+      grid-template-rows: auto 1fr;
+    }
+    .reader.is-open { display: grid; }
+    .reader-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--line);
+    }
+    .reader-bar h2 {
+      font-family: Syne, sans-serif;
+      font-size: 18px;
+      margin: 0;
+      flex: 1;
+    }
+    .reader-bar .path {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .reader-body {
+      overflow: auto;
+      padding: 28px 24px 64px;
+    }
+    .md {
+      width: min(820px, 100%);
+      margin: 0 auto;
+      line-height: 1.65;
+      font-size: 15.5px;
+    }
+    .md h1, .md h2, .md h3 {
+      font-family: Syne, sans-serif;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+    }
+    .md h1 { font-size: 28px; margin: 0 0 16px; }
+    .md h2 { font-size: 20px; margin: 28px 0 10px; border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+    .md h3 { font-size: 16px; margin: 22px 0 8px; }
+    .md p, .md ul, .md ol { margin: 0 0 12px; }
+    .md li { margin: 4px 0; }
+    .md a { color: var(--steel); }
+    .md code {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.88em;
+      background: #141910;
+      padding: 0.1em 0.35em;
+    }
+    .md pre {
+      background: #141910;
+      border: 1px solid var(--line);
+      padding: 12px 14px;
+      overflow: auto;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 13px;
+    }
+    .md pre code { background: none; padding: 0; }
+    .md pre.mermaid {
+      background: #141910;
+      text-align: center;
+      overflow: auto;
+    }
+    .md table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 0 0 16px;
+      font-size: 14px;
+    }
+    .md th, .md td {
+      border: 1px solid var(--line);
+      padding: 8px 10px;
+      text-align: left;
+    }
+    .md th { background: var(--panel); }
+    .md blockquote {
+      margin: 0 0 12px;
+      padding: 0 12px;
+      border-left: 3px solid var(--brass);
+      color: var(--muted);
+    }
+    .md hr { border: 0; border-top: 1px solid var(--line); margin: 24px 0; }
+    .frontmatter {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 20px;
+      white-space: pre-wrap;
+    }
 
     .s-uncovered { color: var(--ash); background: var(--ash); }
     .s-partial { color: var(--brass); background: var(--brass); }
@@ -215,6 +318,19 @@
     </aside>
   </main>
 
+  <div class="reader" id="reader" hidden>
+    <div class="reader-bar">
+      <button class="chip" id="reader-back" type="button">返回图谱</button>
+      <h2 id="reader-title">学习记录</h2>
+      <span class="path" id="reader-path"></span>
+    </div>
+    <div class="reader-body">
+      <article class="md" id="reader-md"></article>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked@15.0.7/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js"></script>
   <script src="dashboard/coverage.js"></script>
   <script>
     const LABELS = { uncovered: "未覆盖", partial: "部分覆盖", covered: "已覆盖", practiced: "已实践" };
@@ -226,12 +342,37 @@
     ];
 
     const data = window.COVERAGE;
+    const notes = window.NOTES || {};
     if (!data) {
       document.body.innerHTML = "<p style='padding:24px'>缺少 dashboard/coverage.js。请运行 python scripts/sync_dashboard.py</p>";
       throw new Error("no coverage");
     }
 
-    const state = { filter: "all", q: "", selected: "reverse-engineering" };
+    if (typeof mermaid !== "undefined") {
+      mermaid.initialize({
+        startOnLoad: false,
+        securityLevel: "strict",
+        theme: "base",
+        themeVariables: {
+          darkMode: true,
+          background: "#141910",
+          primaryColor: "#2c3528",
+          primaryTextColor: "#e6e2d4",
+          primaryBorderColor: "#9aa392",
+          lineColor: "#9aa392",
+          secondaryColor: "#1a2018",
+          tertiaryColor: "#10140e",
+          nodeTextColor: "#e6e2d4",
+        },
+      });
+    }
+    if (typeof marked === "undefined") {
+      document.body.insertAdjacentHTML("afterbegin", "<p style='padding:12px'>Markdown 预览需要联网加载 marked / mermaid。</p>");
+    } else {
+      marked.use({ gfm: true, breaks: false });
+    }
+
+    const state = { filter: "all", q: "", selected: "reverse-engineering", note: null };
 
     function leaves(node, acc = []) {
       if (!node.children || !node.children.length) acc.push(node);
@@ -296,10 +437,11 @@
         <div class="stat"><b>${global.covered + global.practiced}</b><span>已覆盖</span></div>
         <div class="stat"><b>${global.uncovered}</b><span>未覆盖</span></div>
         <div class="stat"><b>${Math.round((global.covered + global.practiced) / allLeaves.length * 100)}%</b><span>概念完成率</span></div>
-        <div class="filters">${chips}<input class="search" placeholder="搜索领域 / 节点" value="${state.q.replaceAll('"', "&quot;")}" /></div>
+        <div class="filters">${chips}<input class="search" placeholder="搜索领域 / 节点" value="${state.q.replaceAll('"', "&quot;")}" /><button class="chip" type="button" data-log="1">学习总账</button></div>
       `;
       tb.querySelectorAll("[data-f]").forEach((b) => b.onclick = () => { state.filter = b.dataset.f; render(); });
       tb.querySelector(".search").oninput = (e) => { state.q = e.target.value.trim().toLowerCase(); render(); };
+      tb.querySelector("[data-log]").onclick = () => openNote("progress/LEARNING_LOG.md");
     }
 
     function renderMap() {
@@ -332,6 +474,112 @@
       </button>`;
     }
 
+    function uniqueNotePaths(node) {
+      const paths = [];
+      const seen = new Set();
+      walk(node).forEach((n) => {
+        (n.learning_notes || []).forEach((p) => {
+          if (!seen.has(p)) { seen.add(p); paths.push(p); }
+        });
+      });
+      const readme = `domains/${node.id}/README.md`;
+      if (notes[readme] && !seen.has(readme)) paths.unshift(readme);
+      return paths;
+    }
+
+    function resolveMd(from, href) {
+      if (!href || href.startsWith("http") || href.startsWith("#")) return null;
+      const clean = href.split("#")[0].split("?")[0];
+      if (!clean.endsWith(".md")) return null;
+      const parts = from.split("/").slice(0, -1);
+      clean.split("/").forEach((seg) => {
+        if (seg === "..") parts.pop();
+        else if (seg !== ".") parts.push(seg);
+      });
+      return parts.join("/");
+    }
+
+    function splitFrontmatter(md) {
+      const match = md.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
+      if (!match) return { meta: "", body: md };
+      return { meta: match[1], body: md.slice(match[0].length) };
+    }
+
+    async function renderMarkdown(target, markdown, fromPath) {
+      const mermaidBlocks = [];
+      const prepared = markdown.replace(/```mermaid[ \t]*\r?\n([\s\S]*?)```/g, (_, src) => {
+        const i = mermaidBlocks.push(src.trim()) - 1;
+        return `\n\n<div class="mermaid-slot" data-i="${i}"></div>\n\n`;
+      });
+      target.innerHTML = typeof marked !== "undefined" ? marked.parse(prepared) : `<pre>${prepared.replace(/[&<>]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]))}</pre>`;
+      target.querySelectorAll(".mermaid-slot").forEach((slot) => {
+        const pre = document.createElement("pre");
+        pre.className = "mermaid";
+        pre.textContent = mermaidBlocks[+slot.dataset.i] || "";
+        slot.replaceWith(pre);
+      });
+      target.querySelectorAll("a[href]").forEach((a) => {
+        const next = resolveMd(fromPath, a.getAttribute("href"));
+        if (next && notes[next]) {
+          a.addEventListener("click", (ev) => {
+            ev.preventDefault();
+            openNote(next);
+          });
+        }
+      });
+      const nodes = target.querySelectorAll("pre.mermaid");
+      if (nodes.length && typeof mermaid !== "undefined") {
+        try { await mermaid.run({ nodes }); } catch (err) { console.error(err); }
+      }
+    }
+
+    async function openNote(path) {
+      const md = notes[path];
+      const reader = document.getElementById("reader");
+      const article = document.getElementById("reader-md");
+      reader.hidden = false;
+      reader.classList.add("is-open");
+      document.getElementById("reader-path").textContent = path;
+      if (!md) {
+        document.getElementById("reader-title").textContent = "找不到笔记";
+        article.innerHTML = "<p>coverage.js 里没有这篇。请运行 <code>python scripts/sync_dashboard.py</code>。</p>";
+        state.note = path;
+        location.hash = "note=" + encodeURIComponent(path);
+        return;
+      }
+      const { meta, body } = splitFrontmatter(md);
+      const titleMatch = body.match(/^#\s+(.+)$/m);
+      document.getElementById("reader-title").textContent = titleMatch ? titleMatch[1] : path.split("/").pop();
+      article.innerHTML = "";
+      if (meta) {
+        const fm = document.createElement("div");
+        fm.className = "frontmatter";
+        fm.textContent = meta;
+        article.appendChild(fm);
+      }
+      const bodyEl = document.createElement("div");
+      article.appendChild(bodyEl);
+      await renderMarkdown(bodyEl, body, path);
+      document.getElementById("reader-body").scrollTop = 0;
+      state.note = path;
+      location.hash = "note=" + encodeURIComponent(path);
+    }
+
+    function closeNote() {
+      state.note = null;
+      const reader = document.getElementById("reader");
+      reader.classList.remove("is-open");
+      reader.hidden = true;
+      if (location.hash.startsWith("#note=")) {
+        history.replaceState(null, "", location.pathname + location.search);
+      }
+    }
+
+    document.getElementById("reader-back").onclick = closeNote;
+    document.addEventListener("keydown", (ev) => {
+      if (ev.key === "Escape" && state.note) closeNote();
+    });
+
     function renderDetail() {
       const node = find(state.selected);
       const box = document.getElementById("detail");
@@ -343,7 +591,13 @@
           collect(c, depth + 1);
         });
       })(node, 0);
-      const notes = (node.learning_notes || []).map((p) => `<a href="${p}">${p}</a>`).join("");
+      const noteLinks = uniqueNotePaths(node).map((p) => {
+        const label = p.includes("/learning/") ? p.split("/").pop() : p;
+        return `<button class="linkish" type="button" data-note="${p}">${label}</button>`;
+      }).join("");
+      const logBtn = notes["progress/LEARNING_LOG.md"]
+        ? `<button class="linkish" type="button" data-note="progress/LEARNING_LOG.md">学习总账</button>`
+        : "";
       const list = kids.length
         ? `<ul class="kids">${kids.map((k) => `<li>
             <span class="dot s-${k.status}"></span>
@@ -356,8 +610,11 @@
         <div class="kv">${node.id} · ${LABELS[node.status]}${node.first_studied ? " · 始学 " + node.first_studied : ""}</div>
         ${node.notes ? `<p class="notes">${node.notes}</p>` : ""}
         ${list}
-        ${notes ? `<div class="links"><strong>学习记录</strong>${notes}</div>` : ""}
+        ${noteLinks || logBtn ? `<div class="links"><strong>学习记录（预览）</strong>${noteLinks}${logBtn}</div>` : ""}
       `;
+      box.querySelectorAll("[data-note]").forEach((btn) => {
+        btn.onclick = () => openNote(btn.dataset.note);
+      });
     }
 
     function render() {
@@ -366,6 +623,11 @@
       renderDetail();
     }
     render();
+
+    const hash = location.hash;
+    if (hash.startsWith("#note=")) {
+      openNote(decodeURIComponent(hash.slice(6)));
+    }
   </script>
 </body>
 </html>
