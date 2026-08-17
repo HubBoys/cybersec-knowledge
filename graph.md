@@ -56,13 +56,14 @@ flowchart TB
   RE -.相邻.-> MA
   RE -.过程框架交叉.-> DFIR
   RE -.IOC 交叉.-> TI
+  IOT -.鉴权交叉.-> ID
 
-  class N,OS,CR,MA,WEB,NET,ID,CL,IOT,DFIR,DET,SOC,SDLC,GRC,ARCH uncovered
-  class F,SP,RE,TI partial
+  class N,OS,CR,MA,WEB,NET,CL,DFIR,DET,SOC,SDLC,GRC,ARCH uncovered
+  class F,SP,RE,TI,IOT,ID partial
   class ABI covered
 ```
 
-## 二进制逆向分析（当前主领域）
+## 二进制逆向分析（当前主领域之一）
 
 ```mermaid
 flowchart TB
@@ -128,21 +129,65 @@ flowchart TB
   class X86,PE,GH,DBG,UP,OB,YA,CPP,MG,FW uncovered
 ```
 
+## 移动与物联网安全（微信小程序）
+
+```mermaid
+flowchart TB
+  classDef uncovered fill:#e5e7eb,stroke:#6b7280,color:#111
+  classDef covered fill:#dcfce7,stroke:#15803d,color:#111
+  classDef practiced fill:#dbeafe,stroke:#1d4ed8,color:#111
+  classDef partial fill:#ffedd5,stroke:#c2410c,color:#111
+
+  MIOT[移动与物联网 · 部分覆盖]
+  MP[微信小程序 · 部分覆盖]
+
+  subgraph done [已学]
+    LAY[缓存包布局 · 已实践]
+    CFG[工程配置缺陷 · 已实践]
+    LOGIN[wx.login 换票模型 · 已覆盖]
+    LIMIT[本地调试边界 · 已覆盖]
+    CLI[开发者工具 CLI · 已实践]
+    TOK[业务 token 复用 · 已覆盖]
+  end
+
+  subgraph todo [未覆盖]
+    CLOUD[小程序云开发]
+    AND[Android]
+    IOS[iOS]
+    IOTDEV[物联网协议]
+  end
+
+  MIOT --> MP
+  MP --> LAY --> CFG
+  MP --> LOGIN --> LIMIT
+  LOGIN --> TOK
+  MP --> CLI
+  MP --> CLOUD
+  MIOT --> AND
+  MIOT --> IOS
+  MIOT --> IOTDEV
+
+  class LAY,CFG,CLI practiced
+  class LOGIN,LIMIT,TOK covered
+  class CLOUD,AND,IOS,IOTDEV uncovered
+  class MIOT,MP partial
+```
+
 ## 覆盖一览
 
 | 领域 | 状态 | 学习记录 |
 |---|---|---|
 | 基础底座 / 网络、OS、密码学 | 部分覆盖（仅 ABI 已覆盖） | [2026-08-17 逆向](domains/reverse-engineering/learning/2026-08-17-binary-reverse-engineering.md) |
-| 系统编程 / ABI 与调用约定 | 部分 / ABI 已覆盖 | [2026-08-17 逆向](domains/reverse-engineering/learning/2026-08-17-binary-reverse-engineering.md) |
+| 系统编程 / ABI 与调用约定 | 部分 / ABI 已覆盖 | 同上 |
 | **二进制逆向分析** | **部分覆盖** | 同上 |
+| **移动与物联网安全** | **部分覆盖** | [2026-08-17 小程序](domains/mobile-iot/learning/2026-08-17-wechat-miniprogram-local-debug.md) |
+| **身份认证与访问控制** | **部分覆盖**（小程序登录交叉） | 同上 |
 | 恶意软件分析 | 未覆盖 | — |
 | Web 安全 | 未覆盖 | — |
 | 网络安全与流量分析 | 未覆盖 | — |
-| 身份认证与访问控制 | 未覆盖 | — |
 | 云与容器安全 | 未覆盖 | — |
-| 移动与物联网安全 | 未覆盖 | — |
 | 应急响应与取证 | 未覆盖 | 过程框架仅在逆向中提及 |
-| 威胁情报 | 部分覆盖（IOC/IOA） | 同上 |
+| 威胁情报 | 部分覆盖（IOC/IOA） | 逆向笔记 |
 | 检测工程 | 未覆盖 | — |
 | SOC 运营 | 未覆盖 | — |
 | 安全开发生命周期 | 未覆盖 | — |

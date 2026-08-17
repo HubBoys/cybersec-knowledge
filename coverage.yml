@@ -142,7 +142,24 @@ domains:
 
   - id: identity
     name: 身份认证与访问控制
-    status: uncovered
+    status: partial
+    notes: 微信小程序 wx.login / 业务 token 概念已覆盖；OAuth、会话管理、MFA 等未覆盖
+    children:
+      - id: id-wx-login-crossref
+        name: 小程序登录与业务 token（交叉）
+        status: covered
+        notes: 详见 mobile-iot 节点 mp-wx-login-model / mp-auth-token-reuse
+        learning_notes:
+          - domains/mobile-iot/learning/2026-08-17-wechat-miniprogram-local-debug.md
+      - id: id-oauth-oidc
+        name: OAuth / OIDC
+        status: uncovered
+      - id: id-session-token
+        name: 会话与 Token 生命周期
+        status: uncovered
+      - id: id-mfa
+        name: 多因素认证
+        status: uncovered
 
   - id: cloud-security
     name: 云与容器安全
@@ -150,7 +167,59 @@ domains:
 
   - id: mobile-iot
     name: 移动与物联网安全
-    status: uncovered
+    status: partial
+    first_studied: 2026-08-17
+    learning_notes:
+      - domains/mobile-iot/learning/2026-08-17-wechat-miniprogram-local-debug.md
+    children:
+      - id: wechat-miniprogram
+        name: 微信小程序
+        status: partial
+        learning_notes:
+          - domains/mobile-iot/learning/2026-08-17-wechat-miniprogram-local-debug.md
+        children:
+          - id: mp-wxapkg-layout
+            name: 客户端缓存包与导入布局
+            status: practiced
+            learning_notes:
+              - domains/mobile-iot/learning/2026-08-17-wechat-miniprogram-local-debug.md
+          - id: mp-project-config
+            name: 解包工程配置与常见缺陷
+            status: practiced
+            learning_notes:
+              - domains/mobile-iot/learning/2026-08-17-wechat-miniprogram-local-debug.md
+          - id: mp-wx-login-model
+            name: wx.login 与后端换票模型
+            status: covered
+            learning_notes:
+              - domains/mobile-iot/learning/2026-08-17-wechat-miniprogram-local-debug.md
+          - id: mp-local-debug-limits
+            name: 本地调试与鉴权边界
+            status: covered
+            learning_notes:
+              - domains/mobile-iot/learning/2026-08-17-wechat-miniprogram-local-debug.md
+          - id: mp-devtools-cli
+            name: 微信开发者工具 CLI
+            status: practiced
+            learning_notes:
+              - domains/mobile-iot/learning/2026-08-17-wechat-miniprogram-local-debug.md
+          - id: mp-auth-token-reuse
+            name: 业务 token 复用与自动化
+            status: covered
+            learning_notes:
+              - domains/mobile-iot/learning/2026-08-17-wechat-miniprogram-local-debug.md
+          - id: mp-cloud-dev
+            name: 小程序云开发安全
+            status: uncovered
+      - id: android-appsec
+        name: Android 应用安全
+        status: uncovered
+      - id: ios-appsec
+        name: iOS 应用安全
+        status: uncovered
+      - id: iot-protocols
+        name: 物联网协议与设备
+        status: uncovered
 
   - id: dfir
     name: 应急响应与取证
