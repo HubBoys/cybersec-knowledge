@@ -57,7 +57,10 @@ flowchart TB
   RE -.过程框架交叉.-> DFIR
   RE -.IOC 交叉.-> TI
   IOT -.鉴权交叉.-> ID
+  IOT -.Flutter AOT / ELF.-> RE
+  IOT -.UniApp JS / wxapkg.-> WEB
   NET -.弱口令交叉.-> ID
+  NET -.mitmproxy.-> IOT
 
   class N,OS,CR,MA,CL,DFIR,DET,SOC,SDLC,GRC,ARCH uncovered
   class F,SP,RE,TI,IOT,ID,WEB,NET partial
@@ -70,6 +73,8 @@ flowchart TB
 flowchart TB
   classDef uncovered fill:#e5e7eb,stroke:#6b7280,color:#111
   classDef covered fill:#dcfce7,stroke:#15803d,color:#111
+  classDef practiced fill:#dbeafe,stroke:#1d4ed8,color:#111
+  classDef partial fill:#ffedd5,stroke:#c2410c,color:#111
 
   RE[二进制逆向分析 · 部分覆盖]
 
@@ -89,19 +94,29 @@ flowchart TB
     ASM[汇编阅读策略]
     WHY[为何需要 C 与 ABI]
     AI[AI 时代门槛]
+    PE[ELF 鉴定 · 非 PE 规范]
+    OB[Flutter --obfuscate]
   end
 
   subgraph todo [未覆盖]
     X86[x86-64 汇编实践]
-    PE[PE / ELF 深入]
-    GH[Ghidra 实操]
-    DBG[调试器实操]
+    DBG2[x64dbg]
     UP[加壳识别]
-    OB[混淆对抗]
     YA[YARA]
     CPP[C++ 逆向]
     MG[.NET / Java]
     FW[固件逆向]
+  end
+
+  subgraph inst [工具安装 · 已实践]
+    GH[Ghidra 安装]
+    R2[radare2]
+    IDAM[IDA MCP]
+    FR[Frida CLI]
+  end
+
+  subgraph cat [概念]
+    DSC[反汇编工具地图]
   end
 
   RE --> P
@@ -114,23 +129,31 @@ flowchart TB
   DC --> ASM
   ASM --> WHY
   RE --> AI
+  RE --> PE
+  RE --> OB
+  RE --> DSC
+  RE --> GH
+  RE --> R2
+  RE --> IDAM
+  RE --> FR
+  DBG[调试器 · 部分] --> R2
+  DBG --> DBG2
 
   RE --> X86
-  RE --> PE
-  RE --> GH
   RE --> DBG
   RE --> UP
-  RE --> OB
   RE --> YA
   RE --> CPP
   RE --> MG
   RE --> FW
 
-  class P,LAB,FID,SP,SB,BH,DIFF,SC,DC,RP,IOC,TL,ASM,WHY,AI covered
-  class X86,PE,GH,DBG,UP,OB,YA,CPP,MG,FW uncovered
+  class P,LAB,FID,SP,SB,BH,DIFF,SC,DC,RP,IOC,TL,ASM,WHY,AI,PE,OB,DSC covered
+  class GH,R2,IDAM,FR practiced
+  class X86,DBG2,UP,YA,CPP,MG,FW uncovered
+  class DBG partial
 ```
 
-## 移动与物联网安全（微信小程序）
+## 移动与物联网安全（小程序 + Android Flutter）
 
 ```mermaid
 flowchart TB
@@ -141,8 +164,9 @@ flowchart TB
 
   MIOT[移动与物联网 · 部分覆盖]
   MP[微信小程序 · 部分覆盖]
+  ANDD[Android 应用安全 · 已覆盖]
 
-  subgraph done [已学]
+  subgraph mp [小程序 · 已学]
     LAY[缓存包布局 · 已实践]
     CFG[工程配置缺陷 · 已实践]
     LOGIN[wx.login 换票模型 · 已覆盖]
@@ -152,9 +176,24 @@ flowchart TB
     TOOL[分析工具栈 · 已覆盖]
   end
 
+  subgraph and [Android Flutter]
+    APK[APK 分层 · 已实践]
+    JADX[Java 壳 / jadx · 已实践]
+    AOT[Flutter AOT / Snapshot · 已实践]
+    BL[Blutter · 已实践]
+    OBF[--obfuscate · 已覆盖]
+    ELF[native .so = ELF · 已实践]
+  end
+
+  subgraph uni [UniApp · 已覆盖]
+    UPACK[四端产物]
+    UMP[小程序包工具]
+    UWWW[App www]
+    UJS[JS 还原]
+  end
+
   subgraph todo [未覆盖]
     CLOUD[小程序云开发]
-    AND[Android]
     IOS[iOS]
     IOTDEV[物联网协议]
   end
@@ -166,13 +205,22 @@ flowchart TB
   MP --> CLI
   MP --> TOOL
   MP --> CLOUD
-  MIOT --> AND
+  MIOT --> ANDD
+  ANDD --> APK --> JADX
+  JADX --> AOT --> BL
+  AOT --> OBF
+  APK --> ELF
+  MIOT --> UNI[UniApp 跨端 · 已覆盖]
+  UNI --> UPACK
+  UNI --> UMP
+  UNI --> UWWW
+  UNI --> UJS
   MIOT --> IOS
   MIOT --> IOTDEV
 
-  class LAY,CFG,CLI practiced
-  class LOGIN,LIMIT,TOK,TOOL covered
-  class CLOUD,AND,IOS,IOTDEV uncovered
+  class LAY,CFG,CLI,APK,JADX,AOT,BL,ELF practiced
+  class LOGIN,LIMIT,TOK,TOOL,OBF,ANDD,UNI,UPACK,UMP,UWWW,UJS covered
+  class CLOUD,IOS,IOTDEV uncovered
   class MIOT,MP partial
 ```
 
@@ -182,6 +230,7 @@ flowchart TB
 flowchart TB
   classDef uncovered fill:#e5e7eb,stroke:#6b7280,color:#111
   classDef covered fill:#dcfce7,stroke:#15803d,color:#111
+  classDef practiced fill:#dbeafe,stroke:#1d4ed8,color:#111
   classDef partial fill:#ffedd5,stroke:#c2410c,color:#111
 
   NET[网络安全与流量分析 · 部分覆盖]
@@ -190,7 +239,9 @@ flowchart TB
   H[THC-Hydra · 已覆盖]
   M[Medusa · 已覆盖]
   NC[Ncrack · 未覆盖]
-  PKT[抓包与流量分析 · 未覆盖]
+  PKT[抓包与流量分析 · 部分覆盖]
+  MITM[mitmproxy · 已实践]
+  PCAP[pcap / Wireshark · 未覆盖]
   IDS[IDS/IPS · 未覆盖]
 
   NET --> DIFF --> PROBE
@@ -198,11 +249,14 @@ flowchart TB
   PROBE --> M
   PROBE --> NC
   NET --> PKT
+  PKT --> MITM
+  PKT --> PCAP
   NET --> IDS
 
   class DIFF,H,M covered
-  class NC,PKT,IDS uncovered
-  class NET,PROBE partial
+  class NC,PCAP,IDS uncovered
+  class MITM practiced
+  class NET,PROBE,PKT partial
 ```
 
 ## 覆盖一览
@@ -211,12 +265,12 @@ flowchart TB
 |---|---|---|
 | 基础底座 / 网络、OS、密码学 | 部分覆盖（仅 ABI 已覆盖） | [2026-08-17 逆向](domains/reverse-engineering/learning/2026-08-17-binary-reverse-engineering.md) |
 | 系统编程 / ABI 与调用约定 | 部分 / ABI 已覆盖 | 同上 |
-| **二进制逆向分析** | **部分覆盖** | 同上 |
-| **移动与物联网安全** | **部分覆盖** | [2026-08-17 小程序](domains/mobile-iot/learning/2026-08-17-wechat-miniprogram-local-debug.md) · [工具栈](domains/mobile-iot/learning/2026-08-17-wechat-mp-tooling.md) |
+| **二进制逆向分析** | **部分覆盖** | [概念过程](domains/reverse-engineering/learning/2026-08-17-binary-reverse-engineering.md) · [工具链安装](domains/reverse-engineering/learning/2026-08-16-re-toolchain.md) · [Flutter AOT 交叉](domains/mobile-iot/learning/2026-08-17-android-flutter-aot.md) |
+| **移动与物联网安全** | **部分覆盖** | [小程序](domains/mobile-iot/learning/2026-08-17-wechat-miniprogram-local-debug.md) · [工具栈](domains/mobile-iot/learning/2026-08-17-wechat-mp-tooling.md) · [Flutter AOT](domains/mobile-iot/learning/2026-08-17-android-flutter-aot.md) · [UniApp](domains/mobile-iot/learning/2026-08-16-uniapp-tooling.md) |
 | **身份认证与访问控制** | **部分覆盖**（小程序登录 + 弱口令在线探测交叉） | [小程序本地调试](domains/mobile-iot/learning/2026-08-17-wechat-miniprogram-local-debug.md) · [Hydra/Medusa](domains/network-security/learning/2026-08-17-hydra-medusa.md) |
 | 恶意软件分析 | 未覆盖 | — |
 | Web 安全 | 部分覆盖（仅 EasyTools 定位） | [工具栈](domains/mobile-iot/learning/2026-08-17-wechat-mp-tooling.md) |
-| **网络安全与流量分析** | **部分覆盖**（Hydra/Medusa 概念） | [2026-08-17 Hydra/Medusa](domains/network-security/learning/2026-08-17-hydra-medusa.md) |
+| **网络安全与流量分析** | **部分覆盖**（Hydra/Medusa 概念 + mitmproxy 安装） | [Hydra/Medusa](domains/network-security/learning/2026-08-17-hydra-medusa.md) · [mitmproxy](domains/network-security/learning/2026-08-16-mitmproxy.md) |
 | 云与容器安全 | 未覆盖 | — |
 | 应急响应与取证 | 未覆盖 | 过程框架仅在逆向中提及 |
 | 威胁情报 | 部分覆盖（IOC/IOA） | 逆向笔记 |

@@ -50,6 +50,8 @@ domains:
     first_studied: 2026-08-17
     learning_notes:
       - domains/reverse-engineering/learning/2026-08-17-binary-reverse-engineering.md
+      - domains/mobile-iot/learning/2026-08-17-android-flutter-aot.md
+      - domains/reverse-engineering/learning/2026-08-16-re-toolchain.md
     children:
       - id: re-process
         name: 逆向完整过程
@@ -87,6 +89,11 @@ domains:
       - id: re-tools
         name: 各阶段推荐工具
         status: covered
+        notes: 过程工具地图为概念；本机已装 Ghidra / radare2 / IDA MCP / Frida；Binary Ninja 未装；Flutter 路径另有 jadx / Blutter
+        learning_notes:
+          - domains/reverse-engineering/learning/2026-08-17-binary-reverse-engineering.md
+          - domains/mobile-iot/learning/2026-08-17-android-flutter-aot.md
+          - domains/reverse-engineering/learning/2026-08-16-re-toolchain.md
       - id: re-assembly-strategy
         name: 汇编阅读策略
         status: covered
@@ -101,19 +108,59 @@ domains:
         status: uncovered
       - id: re-pe-elf
         name: PE / ELF 格式深入
-        status: uncovered
+        status: covered
+        notes: 仅 ELF 共享库鉴定、与 PE/Mach-O 对照、节与 Snapshot 数据的角色；ELF 规范/导入表/链接细节未覆盖。交叉 android-native-elf-so
+        learning_notes:
+          - domains/mobile-iot/learning/2026-08-17-android-flutter-aot.md
+      - id: re-disasm-catalog
+        name: 反汇编工具地图
+        status: covered
+        notes: 只记名称、定位与是否适合 agent；未用这些引擎反汇编样本
+        learning_notes:
+          - domains/reverse-engineering/learning/2026-08-16-re-toolchain.md
       - id: re-ghidra
         name: Ghidra 实操
-        status: uncovered
+        status: practiced
+        notes: 已安装 12.1.2 + JDK 21 并验证启动器；未对样本做反编译
+        learning_notes:
+          - domains/reverse-engineering/learning/2026-08-16-re-toolchain.md
+      - id: re-ida-mcp
+        name: IDA Pro MCP
+        status: practiced
+        notes: 已装插件与 Cursor stdio 配置；需重启 IDA 并打开数据库后 MCP 才可用。不含 IDA 调试会话
+        learning_notes:
+          - domains/reverse-engineering/learning/2026-08-16-re-toolchain.md
+      - id: re-frida
+        name: Frida 动态插桩
+        status: practiced
+        notes: 已装 CLI 17.17.0；未连设备、未写 Hook。Android 还需同版本 frida-server
+        learning_notes:
+          - domains/reverse-engineering/learning/2026-08-16-re-toolchain.md
       - id: re-debugger
         name: 调试器实操
-        status: uncovered
+        status: partial
+        notes: radare2 已安装验证；x64dbg / gdb / IDA 调试会话未做
+        learning_notes:
+          - domains/reverse-engineering/learning/2026-08-16-re-toolchain.md
+        children:
+          - id: re-radare2
+            name: radare2
+            status: practiced
+            notes: 已装 6.2.0 到 E:\tools 并验证 radare2 -v；未对样本做 pd/调试
+            learning_notes:
+              - domains/reverse-engineering/learning/2026-08-16-re-toolchain.md
+          - id: re-x64dbg
+            name: x64dbg
+            status: uncovered
       - id: re-unpacking
         name: 加壳识别与授权实验室内还原
         status: uncovered
       - id: re-obfuscation
         name: 混淆与对抗分析
-        status: uncovered
+        status: covered
+        notes: 仅 Flutter/Dart --obfuscate（改名、split-debug-info）；加壳、控制流平坦化、字符串加密未覆盖
+        learning_notes:
+          - domains/mobile-iot/learning/2026-08-17-android-flutter-aot.md
       - id: re-yara
         name: YARA 检测规则
         status: uncovered
@@ -150,10 +197,11 @@ domains:
   - id: network-security
     name: 网络安全与流量分析
     status: partial
-    notes: 目前仅覆盖在线登录探测工具 Hydra/Medusa 的概念对照；抓包、流量分析、IDS/IPS 未覆盖
+    notes: 目前仅覆盖在线登录探测工具 Hydra/Medusa 的概念对照，以及 mitmproxy 安装验证；pcap 阅读、IDS/IPS 未覆盖
     first_studied: 2026-08-17
     learning_notes:
       - domains/network-security/learning/2026-08-17-hydra-medusa.md
+      - domains/network-security/learning/2026-08-16-mitmproxy.md
     children:
       - id: net-online-vs-offline-auth
         name: 在线登录探测 vs 离线哈希恢复
@@ -184,7 +232,20 @@ domains:
             notes: 对照中提及，未单独学习
       - id: net-packet-analysis
         name: 抓包与流量分析
-        status: uncovered
+        status: partial
+        notes: mitmproxy 已安装验证；pcap 阅读、Wireshark、证书信任模型未覆盖
+        learning_notes:
+          - domains/network-security/learning/2026-08-16-mitmproxy.md
+        children:
+          - id: net-mitmproxy
+            name: mitmproxy
+            status: practiced
+            notes: 已装 12.2.3，验证 mitmproxy/mitmweb/mitmdump --version；未做抓包实验、未写拦截脚本
+            learning_notes:
+              - domains/network-security/learning/2026-08-16-mitmproxy.md
+          - id: net-pcap-reading
+            name: pcap 阅读与 Wireshark
+            status: uncovered
       - id: net-ids-ips
         name: IDS/IPS 概念
         status: uncovered
@@ -227,6 +288,8 @@ domains:
     learning_notes:
       - domains/mobile-iot/learning/2026-08-17-wechat-miniprogram-local-debug.md
       - domains/mobile-iot/learning/2026-08-17-wechat-mp-tooling.md
+      - domains/mobile-iot/learning/2026-08-17-android-flutter-aot.md
+      - domains/mobile-iot/learning/2026-08-16-uniapp-tooling.md
     children:
       - id: wechat-miniprogram
         name: 微信小程序
@@ -304,10 +367,79 @@ domains:
             status: uncovered
       - id: android-appsec
         name: Android 应用安全
-        status: uncovered
+        status: covered
+        first_studied: 2026-08-17
+        notes: 目前覆盖 Flutter AOT 壳鉴定与 Snapshot 专用工具；权限模型、组件导出、加固等未覆盖
+        learning_notes:
+          - domains/mobile-iot/learning/2026-08-17-android-flutter-aot.md
+        children:
+          - id: android-apk-layout
+            name: APK 分层（ZIP / DEX / native）
+            status: practiced
+            learning_notes:
+              - domains/mobile-iot/learning/2026-08-17-android-flutter-aot.md
+          - id: android-java-shell
+            name: Java 壳与 jadx
+            status: practiced
+            notes: 只记 jadx 用于鉴定 Flutter Embedding；不含利用
+            learning_notes:
+              - domains/mobile-iot/learning/2026-08-17-android-flutter-aot.md
+          - id: android-flutter-aot
+            name: Flutter AOT 与 Isolate Snapshot
+            status: practiced
+            learning_notes:
+              - domains/mobile-iot/learning/2026-08-17-android-flutter-aot.md
+          - id: android-flutter-blutter
+            name: Blutter（用 Dart VM 解析 Snapshot）
+            status: practiced
+            notes: 只记原理、产出与适用边界；不是通用反编译器
+            learning_notes:
+              - domains/mobile-iot/learning/2026-08-17-android-flutter-aot.md
+          - id: android-flutter-obfuscate
+            name: Flutter --obfuscate 的影响
+            status: covered
+            notes: 概念层；未用混淆样本实操
+            learning_notes:
+              - domains/mobile-iot/learning/2026-08-17-android-flutter-aot.md
+          - id: android-native-elf-so
+            name: Android native .so 即 ELF
+            status: practiced
+            notes: 交叉节点 re-pe-elf；此处只到鉴定与节角色
+            learning_notes:
+              - domains/mobile-iot/learning/2026-08-17-android-flutter-aot.md
       - id: ios-appsec
         name: iOS 应用安全
         status: uncovered
+      - id: uni-app
+        name: UniApp 跨端产物
+        status: covered
+        notes: 只记打包形态与工具名称/定位；不含解密操作步骤。小程序端工具与 mp-tooling 交叉
+        learning_notes:
+          - domains/mobile-iot/learning/2026-08-16-uniapp-tooling.md
+        children:
+          - id: uniapp-packaging
+            name: 四端产物形态
+            status: covered
+            learning_notes:
+              - domains/mobile-iot/learning/2026-08-16-uniapp-tooling.md
+          - id: uniapp-mp-tools
+            name: 小程序包还原工具
+            status: covered
+            notes: KillWxapkg / wxapkg / wedecode / wxappUnpacker；与 unveilr 同层
+            learning_notes:
+              - domains/mobile-iot/learning/2026-08-16-uniapp-tooling.md
+          - id: uniapp-app-www
+            name: App 端 www 资源
+            status: covered
+            notes: 只记 APK 中 www 路径与 Apktool/jadx 分工；DCloud 加密无官方统一工具
+            learning_notes:
+              - domains/mobile-iot/learning/2026-08-16-uniapp-tooling.md
+          - id: uniapp-js-restore
+            name: JS 还原工具
+            status: covered
+            notes: webcrack / Prettier；不写反混淆操作手册
+            learning_notes:
+              - domains/mobile-iot/learning/2026-08-16-uniapp-tooling.md
       - id: iot-protocols
         name: 物联网协议与设备
         status: uncovered

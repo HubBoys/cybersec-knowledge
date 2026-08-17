@@ -7,12 +7,14 @@ updated: 2026-08-17
 
 # 移动与物联网安全
 
-当前从**微信小程序本地调试与鉴权模型**切入；Android/iOS 应用安全、物联网协议等尚未覆盖。
+当前覆盖：**微信小程序**、**Android Flutter AOT / Blutter**、**UniApp 产物工具地图**（概念）。iOS、物联网协议、Android 权限/组件尚未覆盖。
 
 - 覆盖状态真源：[`coverage.yml`](../../coverage.yml)
 - 本领域笔记：
   - [learning/2026-08-17-wechat-miniprogram-local-debug.md](learning/2026-08-17-wechat-miniprogram-local-debug.md)
   - [learning/2026-08-17-wechat-mp-tooling.md](learning/2026-08-17-wechat-mp-tooling.md)
+  - [learning/2026-08-17-android-flutter-aot.md](learning/2026-08-17-android-flutter-aot.md)
+  - [learning/2026-08-16-uniapp-tooling.md](learning/2026-08-16-uniapp-tooling.md)
 
 ## 子图
 
@@ -25,38 +27,22 @@ flowchart TB
 
   MIOT[移动与物联网 · partial]
   MP[微信小程序 · partial]
+  ANDD[Android · 已覆盖]
+  UNI[UniApp · 已覆盖]
 
-  subgraph done [已学]
-    LAY[解包目录布局]
-    CFG[工程配置缺陷]
-    LOGIN[wx.login 鉴权模型]
-    LIMIT[本地调试边界]
-    CLI[开发者工具 CLI]
-    TOK[业务 token 复用]
-    TOOL[分析工具栈]
-  end
-
-  subgraph todo [未覆盖]
-    AND[Android 应用安全]
-    IOS[iOS 应用安全]
-    IOT[物联网协议与设备]
-    CLOUD[小程序云开发安全]
-  end
-
+  MP --> TOOL[分析工具栈]
+  ANDD --> AOT[Flutter AOT]
+  UNI --> UPACK[四端产物]
+  UNI --> UMP[小程序包工具]
   MIOT --> MP
-  MP --> LAY --> CFG
-  MP --> LOGIN --> LIMIT
-  MP --> CLI
-  LOGIN --> TOK
-  MP --> TOOL
-  MIOT --> AND
-  MIOT --> IOS
-  MIOT --> IOT
-  MP --> CLOUD
+  MIOT --> ANDD
+  MIOT --> UNI
+  MIOT --> IOS[iOS]
+  MIOT --> IOT[物联网]
 
-  class LAY,CFG,CLI practiced
-  class LOGIN,LIMIT,TOK,TOOL covered
-  class AND,IOS,IOT,CLOUD uncovered
+  class AOT practiced
+  class TOOL,ANDD,UNI,UPACK,UMP covered
+  class IOS,IOT uncovered
   class MP,MIOT partial
 ```
 
@@ -64,22 +50,22 @@ flowchart TB
 
 | 节点 id | 深度 | 要点 |
 |---|---|---|
-| `mp-wxapkg-layout` | practiced | 导入 `__APP__`，不是版本根目录 |
-| `mp-project-config` | practiced | componentFramework / Skyline lazyCodeLoading / WXML 拆串 / WXS 路径 |
-| `mp-wx-login-model` | covered | code 绑定 AppID；后端 AppSecret 换票；业务 token |
-| `mp-local-debug-limits` | covered | mock 只过前端门禁 |
-| `mp-devtools-cli` | practiced | wechatide 授权调试用途 |
-| `mp-auth-token-reuse` | covered | 合法长效 token 可减少反复 wx.login |
-| `mp-tooling` 及 unveilr / EasyTools / OpenDevTools / First / wechatide-skill | covered | 产物还原、官方调试、新旧运行时、工作台分层；新版微信 OpenDevTools 不可用 |
+| 小程序布局 / 配置 / CLI | practiced | 见本地调试笔记 |
+| `mp-tooling` | covered | unveilr / EasyTools / First 等 |
+| Android Flutter 各子节点 | practiced / covered | 见 AOT 笔记 |
+| `uni-app` 及四端 / www / JS 还原 | concept | KillWxapkg 等与 unveilr 同层；不含解密步骤 |
 
 ## 未覆盖（建议顺序）
 
-1. 自有小程序上的 automator + 测试号实践
-2. First 在授权实验室的实践记录（工具已入图谱）
-3. 小程序云开发鉴权概念
-4. Android 应用基础（APK 结构、权限）
+1. 自有小程序 automator + 测试号
+2. 自有未加密 UniApp 演示包对照 `www`
+3. First 实践记录
+4. 小程序云开发
+5. Android 权限、组件导出、网络安全配置
+6. iOS
 
 ## 与其他领域的边
 
-- 身份认证：`mp-wx-login-model` / `mp-auth-token-reuse` 与 token/session 模型交叉
-- 二进制逆向：解包产物分析是「客户端产物」旁支，不是传统 PE/ELF 逆向主线
+- 身份认证：wx.login / 业务 token
+- 二进制逆向：Flutter ELF、Frida、jadx
+- 流量：mitmproxy
